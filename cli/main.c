@@ -537,7 +537,19 @@ static int build_summary(void) {
     snprintf(summary_path, sizeof(summary_path), "%s/summary.json", repo_root);
     int rc = write_file(summary_path, summary);
     free(summary);
-    return rc;
+    if (rc != 0) {
+        return -1;
+    }
+
+    char web_summary_path[PATH_MAX];
+    snprintf(web_summary_path, sizeof(web_summary_path), "%s/web/public/summary.json", repo_root);
+    char copy_cmd[PATH_MAX * 2];
+    snprintf(copy_cmd, sizeof(copy_cmd), "cp \"%s\" \"%s\"", summary_path, web_summary_path);
+    if (system(copy_cmd) != 0) {
+        fprintf(stderr, "warning: failed to copy summary.json to web/public/\n");
+    }
+
+    return 0;
 }
 
 static int run_git_commit(const char *result, const char *id, const char *memo) {

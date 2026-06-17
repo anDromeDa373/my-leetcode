@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import dummySummary from './data/dummySummary.json'
+import { fetchSummary } from './lib/summary'
 
 function pointsClass(points) {
   if (points >= 3) return 'bg-yellow-500 shadow-[0_0_16px_rgba(234,179,8,0.55)]'
@@ -17,25 +17,6 @@ function formatLastAttempt(ts) {
     month: '2-digit',
     day: '2-digit',
   })
-}
-
-function sortProblems(problems) {
-  return [...problems]
-    .filter((p) => /^nc\d{3}$/.test(p.id))
-    .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }))
-    .slice(0, 150)
-}
-
-async function loadSummary() {
-  if (import.meta.env.DEV) {
-    return dummySummary
-  }
-
-  const res = await fetch('/summary.json')
-  if (!res.ok) {
-    throw new Error(`summary.json の読み込みに失敗しました (HTTP ${res.status})`)
-  }
-  return res.json()
 }
 
 function Tile({ problem }) {
@@ -67,15 +48,17 @@ function App() {
   useEffect(() => {
     let cancelled = false
 
-    loadSummary()
-      .then((data) => {
+    fetchSummary()
+      .then(({ problems: loadedProblems, updatedAt: loadedUpdatedAt }) => {
         if (cancelled) return
-        setProblems(sortProblems(data.problems ?? []))
-        setUpdatedAt(data.updated_at ?? null)
+        setProblems(loadedProblems)
+        setUpdatedAt(loadedUpdatedAt)
         setError(null)
       })
       .catch((err) => {
         if (cancelled) return
+        setProblems([])
+        setUpdatedAt(null)
         setError(err.message)
       })
       .finally(() => {

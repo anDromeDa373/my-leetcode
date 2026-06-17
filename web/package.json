@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "sync-summary": "node scripts/sync-summary.mjs",
+    "predev": "npm run sync-summary",
     "dev": "vite",
+    "prebuild": "npm run sync-summary",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
