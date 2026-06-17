@@ -1,5 +1,5 @@
 {
-  "updated_at": 1781702229,
+  "updated_at": 1781702230,
   "problems": [
     {
   "id": "nc101",
@@ -918,8 +918,8 @@
   "title": "Contains Duplicate",
   "url": "https://leetcode.com/problems/contains-duplicate/",
   "difficulty": "",
-  "points": 1,
-  "last_attempt": 1781702229,
+  "points": 0,
+  "last_attempt": 1781702230,
   "history": [
     {
       "date": "2026-06-17",
@@ -934,6 +934,11 @@
     {
       "date": "2026-06-17",
       "result": "ok",
+      "memo": "test"
+    },
+    {
+      "date": "2026-06-17",
+      "result": "no",
       "memo": "test"
     },
     {
