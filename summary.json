@@ -1,18 +1,23 @@
 {
-  "updated_at": 1781661271,
+  "updated_at": 1781661277,
   "problems": [
     {
   "id": "ex0001",
   "title": "Two Sum",
   "url": "https://leetcode.com/problems/two-sum/",
   "difficulty": "Easy",
-  "points": 1,
-  "last_attempt": 1781661271,
+  "points": 0,
+  "last_attempt": 1781661277,
   "history": [
     {
       "date": "2026-06-17",
       "result": "ok",
       "memo": "O(N)で解けた"
+    },
+    {
+      "date": "2026-06-17",
+      "result": "no",
+      "memo": "セグフォした"
     }
   ]
 }
