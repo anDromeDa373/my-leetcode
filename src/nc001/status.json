@@ -1,0 +1,15 @@
+{
+  "id": "nc001",
+  "title": "Contains Duplicate",
+  "url": "https://leetcode.com/problems/contains-duplicate/",
+  "difficulty": "",
+  "points": 1,
+  "last_attempt": 1781701666,
+  "history": [
+    {
+      "date": "2026-06-17",
+      "result": "ok",
+      "memo": "normalize test"
+    }
+  ]
+}

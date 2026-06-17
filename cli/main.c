@@ -184,6 +184,11 @@ static int parse_json_int(const char *json, const char *key, long *out) {
     }
     pos = skip_ws(pos + 1);
 
+    if (strncmp(pos, "null", 4) == 0) {
+        *out = 0;
+        return 0;
+    }
+
     if (*pos == '"') {
         pos++;
         char buf[64];
@@ -309,10 +314,13 @@ static int load_status(const char *path, ProblemStatus *status) {
     memset(status, 0, sizeof(*status));
     if (parse_json_string(json, "id", status->id, sizeof(status->id)) != 0 ||
         parse_json_string(json, "title", status->title, sizeof(status->title)) != 0 ||
-        parse_json_string(json, "url", status->url, sizeof(status->url)) != 0 ||
-        parse_json_string(json, "difficulty", status->difficulty, sizeof(status->difficulty)) != 0) {
+        parse_json_string(json, "url", status->url, sizeof(status->url)) != 0) {
         free(json);
         return -1;
+    }
+
+    if (parse_json_string(json, "difficulty", status->difficulty, sizeof(status->difficulty)) != 0) {
+        status->difficulty[0] = '\0';
     }
 
     long value = 0;
@@ -577,10 +585,31 @@ static int run_git_commit(const char *result, const char *id, const char *memo) 
     return 0;
 }
 
+static int normalize_id(const char *input, char *out, size_t out_size) {
+    if (input == NULL || input[0] == '\0') {
+        return -1;
+    }
+
+    if (strncmp(input, "nc", 2) == 0) {
+        strncpy(out, input, out_size - 1);
+        out[out_size - 1] = '\0';
+        return 0;
+    }
+
+    char *end = NULL;
+    long num = strtol(input, &end, 10);
+    if (end == input || (end != NULL && *end != '\0') || num < 1 || num > 999) {
+        return -1;
+    }
+
+    snprintf(out, out_size, "nc%03ld", num);
+    return 0;
+}
+
 static void usage(const char *prog) {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "  %s ok <id> \"<memo>\"\n", prog);
-    fprintf(stderr, "  %s no <id> \"<memo>\"\n", prog);
+    fprintf(stderr, "  %s ok <id> \"<memo>\"   (e.g. %s ok 001 \"O(N)\")\n", prog, prog);
+    fprintf(stderr, "  %s no <id> \"<memo>\"   (e.g. %s no 001 \"TLE\")\n", prog, prog);
 }
 
 int main(int argc, char *argv[]) {
@@ -590,11 +619,18 @@ int main(int argc, char *argv[]) {
     }
 
     const char *result = argv[1];
-    const char *id = argv[2];
+    const char *raw_id = argv[2];
     const char *memo = argv[3];
 
     if (strcmp(result, "ok") != 0 && strcmp(result, "no") != 0) {
         fprintf(stderr, "error: result must be 'ok' or 'no'\n");
+        usage(argv[0]);
+        return 1;
+    }
+
+    char id[64];
+    if (normalize_id(raw_id, id, sizeof(id)) != 0) {
+        fprintf(stderr, "error: invalid id '%s' (use 001 or nc001)\n", raw_id);
         usage(argv[0]);
         return 1;
     }
